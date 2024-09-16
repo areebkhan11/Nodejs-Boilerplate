@@ -7,15 +7,19 @@ const cookieSession = require('cookie-session');
 const { notFound, errorHandler } = require('./middlewares/errorHandling');
 const { log } = require('./middlewares/log');
 const { generateResponse } = require('./utils');
+const { io } = require('./socket');
 require('dotenv').config();
+const useragent = require('express-useragent');
 const PORT = process.env.PORT;
 
 const app = express();
 DB_CONNECT();
 
 const server = http.createServer(app);
+io(server);
 
 app.use(express.json());
+app.use(useragent.express());
 app.use(express.urlencoded({ extended: true, limit: "30mb" }));
 app.use('/uploads', express.static('uploads'));
 app.use(cookieSession({

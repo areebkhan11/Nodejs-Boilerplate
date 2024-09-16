@@ -1,7 +1,10 @@
 const multer = require('multer');
 const fs = require('fs');
 const FCM = require('fcm-node');
+const { STATUS_CODES, ROLES } = require('./constants');
 const moment = require('moment');
+const generator = require('generate-password');
+const bcrypt = require('bcrypt');
 
 exports.generateResponse = (data, message, res, code = 200) => {
     return res.status(code).json({
@@ -156,3 +159,36 @@ exports.formatDate = (date) => moment(date).format('DD-MM-YYYY');
 exports.formatTime = (date) => moment(date).format('HH:mm:ss');
 
 exports.formatDateTime = (date) => moment(date).format('DD-MM-YYYY HH:mm:ss');
+
+exports.generateRandomPassword = () => generator.generate({
+    length: 8,
+    uppercase: true,
+    lowercase: true,
+    numbers: true
+})
+
+exports.hashPassword = async (password) => {
+    return await bcrypt.hash(password, 10);
+}
+
+exports.comparePassword = async (password, hash) => {
+    return await bcrypt.compare(password, hash);
+}
+
+exports.calculateDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 3958.8; // Radius of the Earth in miles
+    const dLat = deg2rad(lat2 - lat1);
+    const dLon = deg2rad(lon2 - lon1);
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c;
+    return distance;
+}
+
+function deg2rad(deg) {
+    return deg * (Math.PI / 180);
+}
+

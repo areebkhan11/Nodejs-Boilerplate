@@ -1,4 +1,6 @@
 const { Schema, model } = require("mongoose");
+// const { STATUS_CODES } = require("../utils/constants");
+const { STATUS_CODES } = require('http');
 
 const logSchema = new Schema({
     timestamp: { type: Date, default: Date.now },
@@ -39,6 +41,7 @@ class ErrorHandling {
 
         return res.status(statusCode).json({
             statusCode,
+            error: STATUS_CODES[statusCode],
             message: error?.message,
             // stack: error?.stack,
         });
